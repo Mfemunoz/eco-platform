@@ -2,9 +2,9 @@
 ==========================================================
 ECO PLATFORM
 Archivo: 03_constraints.sql
-Versión: 1.0
+Versión: 2.0
 Descripción:
-Llaves primarias, foráneas, restricciones UNIQUE y CHECK.
+Llaves foráneas y restricciones CHECK.
 ==========================================================
 */
 
@@ -21,7 +21,9 @@ SET search_path TO eco, public;
 ALTER TABLE usuarios
 ADD CONSTRAINT fk_usuarios_roles
 FOREIGN KEY (rol_id)
-REFERENCES roles(id);
+REFERENCES roles(id)
+ON UPDATE CASCADE
+ON DELETE RESTRICT;
 
 -- ------------------------------------------------------
 -- VEHICULOS
@@ -30,7 +32,9 @@ REFERENCES roles(id);
 ALTER TABLE vehiculos
 ADD CONSTRAINT fk_vehiculos_transportadoras
 FOREIGN KEY (transportadora_id)
-REFERENCES transportadoras(id);
+REFERENCES transportadoras(id)
+ON UPDATE CASCADE
+ON DELETE RESTRICT;
 
 -- ------------------------------------------------------
 -- CONTENEDORES
@@ -39,12 +43,16 @@ REFERENCES transportadoras(id);
 ALTER TABLE contenedores
 ADD CONSTRAINT fk_contenedores_tipo
 FOREIGN KEY (tipo_contenedor_id)
-REFERENCES tipos_contenedor(id);
+REFERENCES tipos_contenedor(id)
+ON UPDATE CASCADE
+ON DELETE RESTRICT;
 
 ALTER TABLE contenedores
 ADD CONSTRAINT fk_contenedores_estado
 FOREIGN KEY (estado_actual_id)
-REFERENCES estados(id);
+REFERENCES estados(id)
+ON UPDATE CASCADE
+ON DELETE RESTRICT;
 
 -- ------------------------------------------------------
 -- PROGRAMACIONES
@@ -53,131 +61,173 @@ REFERENCES estados(id);
 ALTER TABLE programaciones
 ADD CONSTRAINT fk_programacion_contenedor
 FOREIGN KEY (contenedor_id)
-REFERENCES contenedores(id);
+REFERENCES contenedores(id)
+ON UPDATE CASCADE
+ON DELETE RESTRICT;
+
+ALTER TABLE programaciones
+ADD CONSTRAINT fk_programacion_estado
+FOREIGN KEY (estado_id)
+REFERENCES estados(id)
+ON UPDATE CASCADE
+ON DELETE RESTRICT;
 
 ALTER TABLE programaciones
 ADD CONSTRAINT fk_programacion_origen
 FOREIGN KEY (ubicacion_origen_id)
-REFERENCES ubicaciones(id);
+REFERENCES ubicaciones(id)
+ON UPDATE CASCADE
+ON DELETE RESTRICT;
 
 ALTER TABLE programaciones
 ADD CONSTRAINT fk_programacion_destino
 FOREIGN KEY (ubicacion_destino_id)
-REFERENCES ubicaciones(id);
+REFERENCES ubicaciones(id)
+ON UPDATE CASCADE
+ON DELETE RESTRICT;
 
--- ======================================================
+-- ------------------------------------------------------
 -- ASIGNACIONES
--- ======================================================
+-- ------------------------------------------------------
 
 ALTER TABLE asignaciones
 ADD CONSTRAINT fk_asignaciones_programacion
 FOREIGN KEY (programacion_id)
-REFERENCES programaciones(id);
+REFERENCES programaciones(id)
+ON UPDATE CASCADE
+ON DELETE RESTRICT;
 
 ALTER TABLE asignaciones
 ADD CONSTRAINT fk_asignaciones_vehiculo
 FOREIGN KEY (vehiculo_id)
-REFERENCES vehiculos(id);
+REFERENCES vehiculos(id)
+ON UPDATE CASCADE
+ON DELETE RESTRICT;
 
 ALTER TABLE asignaciones
 ADD CONSTRAINT fk_asignaciones_usuario
 FOREIGN KEY (usuario_id)
-REFERENCES usuarios(id);
+REFERENCES usuarios(id)
+ON UPDATE CASCADE
+ON DELETE RESTRICT;
 
 ALTER TABLE asignaciones
 ADD CONSTRAINT fk_asignaciones_estado
 FOREIGN KEY (estado_id)
-REFERENCES estados(id);
+REFERENCES estados(id)
+ON UPDATE CASCADE
+ON DELETE RESTRICT;
 
--- ======================================================
+-- ------------------------------------------------------
 -- MOVIMIENTOS
--- ======================================================
+-- ------------------------------------------------------
 
 ALTER TABLE movimientos
 ADD CONSTRAINT fk_movimientos_programacion
 FOREIGN KEY (programacion_id)
-REFERENCES programaciones(id);
+REFERENCES programaciones(id)
+ON UPDATE CASCADE
+ON DELETE RESTRICT;
 
 ALTER TABLE movimientos
 ADD CONSTRAINT fk_movimientos_estado
 FOREIGN KEY (estado_id)
-REFERENCES estados(id);
+REFERENCES estados(id)
+ON UPDATE CASCADE
+ON DELETE RESTRICT;
 
--- ======================================================
+-- ------------------------------------------------------
 -- EVENTOS
--- ======================================================
+-- ------------------------------------------------------
 
 ALTER TABLE eventos
 ADD CONSTRAINT fk_eventos_movimiento
 FOREIGN KEY (movimiento_id)
-REFERENCES movimientos(id);
+REFERENCES movimientos(id)
+ON UPDATE CASCADE
+ON DELETE RESTRICT;
 
 ALTER TABLE eventos
 ADD CONSTRAINT fk_eventos_tipo
 FOREIGN KEY (tipo_evento_id)
-REFERENCES tipos_evento(id);
+REFERENCES tipos_evento(id)
+ON UPDATE CASCADE
+ON DELETE RESTRICT;
 
 ALTER TABLE eventos
 ADD CONSTRAINT fk_eventos_usuario
 FOREIGN KEY (usuario_id)
-REFERENCES usuarios(id);
+REFERENCES usuarios(id)
+ON UPDATE CASCADE
+ON DELETE RESTRICT;
 
 ALTER TABLE eventos
 ADD CONSTRAINT fk_eventos_causal
 FOREIGN KEY (causal_id)
-REFERENCES causales(id);
+REFERENCES causales(id)
+ON UPDATE CASCADE
+ON DELETE SET NULL;
 
--- ======================================================
+-- ------------------------------------------------------
 -- AUDIT LOG
--- ======================================================
+-- ------------------------------------------------------
 
 ALTER TABLE audit_log
 ADD CONSTRAINT fk_audit_usuario
 FOREIGN KEY (usuario_id)
-REFERENCES usuarios(id);
+REFERENCES usuarios(id)
+ON UPDATE CASCADE
+ON DELETE SET NULL;
 
 -- ======================================================
--- RESTRICCIONES UNIQUE
+-- CREATED_BY / UPDATED_BY
 -- ======================================================
 
-ALTER TABLE roles
-ADD CONSTRAINT uq_roles_nombre
-UNIQUE (nombre);
+DO $$
+DECLARE
+    t TEXT;
+BEGIN
+    FOREACH t IN ARRAY ARRAY[
+        'roles',
+        'usuarios',
+        'transportadoras',
+        'vehiculos',
+        'ubicaciones',
+        'estados',
+        'tipos_evento',
+        'tipos_contenedor',
+        'causales',
+        'contenedores',
+        'programaciones',
+        'asignaciones',
+        'movimientos',
+        'eventos'
+    ]
+    LOOP
 
-ALTER TABLE usuarios
-ADD CONSTRAINT uq_usuarios_correo
-UNIQUE (correo);
+        EXECUTE format('
+            ALTER TABLE %I
+            ADD CONSTRAINT fk_%I_created_by
+            FOREIGN KEY (created_by)
+            REFERENCES usuarios(id)
+            ON UPDATE CASCADE
+            ON DELETE SET NULL;',
+            t, t);
 
-ALTER TABLE transportadoras
-ADD CONSTRAINT uq_transportadoras_nit
-UNIQUE (nit);
+        EXECUTE format('
+            ALTER TABLE %I
+            ADD CONSTRAINT fk_%I_updated_by
+            FOREIGN KEY (updated_by)
+            REFERENCES usuarios(id)
+            ON UPDATE CASCADE
+            ON DELETE SET NULL;',
+            t, t);
 
-ALTER TABLE vehiculos
-ADD CONSTRAINT uq_vehiculos_placa
-UNIQUE (placa);
-
-ALTER TABLE estados
-ADD CONSTRAINT uq_estados_codigo
-UNIQUE (codigo);
-
-ALTER TABLE tipos_evento
-ADD CONSTRAINT uq_tipos_evento_codigo
-UNIQUE (codigo);
-
-ALTER TABLE tipos_contenedor
-ADD CONSTRAINT uq_tipos_contenedor_codigo
-UNIQUE (codigo);
-
-ALTER TABLE causales
-ADD CONSTRAINT uq_causales_codigo
-UNIQUE (codigo);
-
-ALTER TABLE contenedores
-ADD CONSTRAINT uq_contenedores_serial
-UNIQUE (serial);
+    END LOOP;
+END $$;
 
 -- ======================================================
--- RESTRICCIONES CHECK
+-- CHECK
 -- ======================================================
 
 ALTER TABLE ubicaciones
@@ -189,15 +239,15 @@ CHECK (
 ALTER TABLE eventos
 ADD CONSTRAINT chk_eventos_latitud
 CHECK (
-    latitud IS NULL OR
-    (latitud >= -90 AND latitud <= 90)
+    latitud IS NULL
+    OR (latitud BETWEEN -90 AND 90)
 );
 
 ALTER TABLE eventos
 ADD CONSTRAINT chk_eventos_longitud
 CHECK (
-    longitud IS NULL OR
-    (longitud >= -180 AND longitud <= 180)
+    longitud IS NULL
+    OR (longitud BETWEEN -180 AND 180)
 );
 
 ALTER TABLE movimientos
@@ -209,5 +259,5 @@ CHECK (
 );
 
 -- ======================================================
--- FIN DEL ARCHIVO
+-- FIN
 -- ======================================================

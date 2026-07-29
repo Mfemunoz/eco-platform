@@ -2,7 +2,7 @@
 ==========================================================
 ECO PLATFORM
 Archivo: 04_indexes.sql
-Versión: 1.0
+Versión: 2.0
 Descripción:
 Creación de índices para optimizar el rendimiento.
 ==========================================================
@@ -36,6 +36,9 @@ ON contenedores (estado_actual_id);
 
 CREATE INDEX idx_programaciones_contenedor
 ON programaciones (contenedor_id);
+
+CREATE INDEX idx_programaciones_estado
+ON programaciones (estado_id);
 
 CREATE INDEX idx_programaciones_origen
 ON programaciones (ubicacion_origen_id);
@@ -104,6 +107,9 @@ ON audit_log (usuario_id);
 CREATE INDEX idx_audit_fecha
 ON audit_log (fecha);
 
+CREATE INDEX idx_audit_tabla
+ON audit_log (tabla);
+
 -- ======================================================
 -- ÍNDICES PARA CONSULTAS OPERATIVAS
 -- ======================================================
@@ -114,8 +120,15 @@ ON programaciones (fecha_programada);
 CREATE INDEX idx_programaciones_contenedor_fecha
 ON programaciones (contenedor_id, fecha_programada);
 
+CREATE INDEX idx_programaciones_estado_fecha
+ON programaciones (estado_id, fecha_programada);
+
 CREATE INDEX idx_eventos_movimiento_fecha
 ON eventos (movimiento_id, fecha_hora);
 
 CREATE INDEX idx_movimientos_programacion_estado
 ON movimientos (programacion_id, estado_id);
+
+-- ======================================================
+-- FIN DEL ARCHIVO
+-- ======================================================

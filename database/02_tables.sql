@@ -2,7 +2,7 @@
 ==========================================================
 ECO PLATFORM
 Archivo: 02_tables.sql
-Versión: 1.0
+Versión: 2.0
 Descripción:
 Creación de las tablas principales del sistema.
 ==========================================================
@@ -17,13 +17,15 @@ SET search_path TO eco, public;
 CREATE TABLE roles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
-    nombre VARCHAR(50) NOT NULL,
+    nombre VARCHAR(50) NOT NULL UNIQUE,
     descripcion TEXT,
 
     activo BOOLEAN NOT NULL DEFAULT TRUE,
 
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID,
+    updated_by UUID
 );
 
 -- ======================================================
@@ -34,14 +36,16 @@ CREATE TABLE usuarios (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     nombre VARCHAR(150) NOT NULL,
-    correo VARCHAR(150) NOT NULL,
+    correo VARCHAR(150) NOT NULL UNIQUE,
 
     rol_id UUID NOT NULL,
 
     activo BOOLEAN NOT NULL DEFAULT TRUE,
 
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID,
+    updated_by UUID
 );
 
 -- ======================================================
@@ -52,15 +56,17 @@ CREATE TABLE transportadoras (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     nombre VARCHAR(120) NOT NULL,
-    nit VARCHAR(30) NOT NULL,
+    nit VARCHAR(30) NOT NULL UNIQUE,
 
     telefono VARCHAR(30),
     email VARCHAR(120),
 
     activo BOOLEAN NOT NULL DEFAULT TRUE,
 
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID,
+    updated_by UUID
 );
 
 -- ======================================================
@@ -70,7 +76,7 @@ CREATE TABLE transportadoras (
 CREATE TABLE vehiculos (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
-    placa VARCHAR(10) NOT NULL,
+    placa VARCHAR(10) NOT NULL UNIQUE,
 
     tipo VARCHAR(50) NOT NULL,
 
@@ -80,8 +86,10 @@ CREATE TABLE vehiculos (
 
     activo BOOLEAN NOT NULL DEFAULT TRUE,
 
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID,
+    updated_by UUID
 );
 
 -- ======================================================
@@ -92,15 +100,16 @@ CREATE TABLE ubicaciones (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     nombre VARCHAR(120) NOT NULL,
-
     tipo VARCHAR(30) NOT NULL,
 
     descripcion TEXT,
 
     activo BOOLEAN NOT NULL DEFAULT TRUE,
 
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID,
+    updated_by UUID
 );
 
 -- ======================================================
@@ -110,16 +119,17 @@ CREATE TABLE ubicaciones (
 CREATE TABLE estados (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
-    codigo VARCHAR(30) NOT NULL,
-
+    codigo VARCHAR(30) NOT NULL UNIQUE,
     nombre VARCHAR(80) NOT NULL,
 
     descripcion TEXT,
 
     activo BOOLEAN NOT NULL DEFAULT TRUE,
 
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID,
+    updated_by UUID
 );
 
 -- ======================================================
@@ -129,16 +139,17 @@ CREATE TABLE estados (
 CREATE TABLE tipos_evento (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
-    codigo VARCHAR(30) NOT NULL,
-
+    codigo VARCHAR(30) NOT NULL UNIQUE,
     nombre VARCHAR(100) NOT NULL,
 
     descripcion TEXT,
 
     activo BOOLEAN NOT NULL DEFAULT TRUE,
 
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID,
+    updated_by UUID
 );
 
 -- ======================================================
@@ -148,7 +159,7 @@ CREATE TABLE tipos_evento (
 CREATE TABLE tipos_contenedor (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
-    codigo VARCHAR(20) NOT NULL,
+    codigo VARCHAR(20) NOT NULL UNIQUE,
 
     descripcion VARCHAR(100) NOT NULL,
 
@@ -156,8 +167,10 @@ CREATE TABLE tipos_contenedor (
 
     activo BOOLEAN NOT NULL DEFAULT TRUE,
 
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID,
+    updated_by UUID
 );
 
 -- ======================================================
@@ -167,14 +180,17 @@ CREATE TABLE tipos_contenedor (
 CREATE TABLE causales (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
-    codigo VARCHAR(30) NOT NULL,
+    codigo VARCHAR(30) NOT NULL UNIQUE,
     nombre VARCHAR(120) NOT NULL,
+
     descripcion TEXT,
 
     activo BOOLEAN NOT NULL DEFAULT TRUE,
 
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID,
+    updated_by UUID
 );
 
 -- ======================================================
@@ -184,7 +200,7 @@ CREATE TABLE causales (
 CREATE TABLE contenedores (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
-    serial VARCHAR(50) NOT NULL,
+    serial VARCHAR(50) NOT NULL UNIQUE,
 
     tipo_contenedor_id UUID NOT NULL,
 
@@ -192,8 +208,10 @@ CREATE TABLE contenedores (
 
     activo BOOLEAN NOT NULL DEFAULT TRUE,
 
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID,
+    updated_by UUID
 );
 
 -- ======================================================
@@ -205,15 +223,19 @@ CREATE TABLE programaciones (
 
     contenedor_id UUID NOT NULL,
 
-    fecha_programada DATE NOT NULL,
+    estado_id UUID NOT NULL,
+
+    fecha_programada TIMESTAMPTZ NOT NULL,
 
     ubicacion_origen_id UUID NOT NULL,
     ubicacion_destino_id UUID NOT NULL,
 
     observacion TEXT,
 
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID,
+    updated_by UUID
 );
 
 -- ======================================================
@@ -231,12 +253,14 @@ CREATE TABLE asignaciones (
 
     estado_id UUID NOT NULL,
 
-    fecha_asignacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_asignacion TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     observacion TEXT,
 
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID,
+    updated_by UUID
 );
 
 -- ======================================================
@@ -250,13 +274,17 @@ CREATE TABLE movimientos (
 
     estado_id UUID NOT NULL,
 
-    inicio_real TIMESTAMP,
-    fin_real TIMESTAMP,
+    inicio_real TIMESTAMPTZ,
+    fin_real TIMESTAMPTZ,
+
+    duracion INTERVAL,
 
     observacion TEXT,
 
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID,
+    updated_by UUID
 );
 
 -- ======================================================
@@ -274,7 +302,7 @@ CREATE TABLE eventos (
 
     causal_id UUID,
 
-    fecha_hora TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_hora TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     observacion TEXT,
 
@@ -283,8 +311,10 @@ CREATE TABLE eventos (
     latitud NUMERIC(10,7),
     longitud NUMERIC(10,7),
 
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID,
+    updated_by UUID
 );
 
 -- ======================================================
@@ -302,8 +332,7 @@ CREATE TABLE audit_log (
 
     usuario_id UUID,
 
-    fecha TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     datos JSONB
 );
-
