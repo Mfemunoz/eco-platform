@@ -5,53 +5,74 @@ class StatusBadge extends StatelessWidget {
 
   const StatusBadge({super.key, required this.estado});
 
-  Color getColor() {
-    switch (estado.toLowerCase()) {
-      case 'en tránsito':
-        return Colors.green;
-
-      case 'en puerto':
-        return Colors.orange;
-
-      case 'liberado':
-        return Colors.blue;
-
-      case 'incidencia':
-        return Colors.red;
-
-      default:
-        return Colors.grey;
-    }
-  }
-
-  IconData getIcon() {
-    switch (estado.toLowerCase()) {
-      case 'en tránsito':
-        return Icons.local_shipping;
-
-      case 'en puerto':
-        return Icons.anchor;
-
-      case 'liberado':
-        return Icons.check_circle;
-
-      case 'incidencia':
-        return Icons.warning;
-
-      default:
-        return Icons.info;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final color = getColor();
+    Color color;
+
+    Color background;
+
+    IconData icon;
+
+    switch (estado.toLowerCase()) {
+      case 'disponible':
+        color = Colors.green;
+
+        background = Colors.green.withOpacity(0.15);
+
+        icon = Icons.check_circle;
+
+        break;
+
+      case 'en ruta':
+        color = Colors.orange;
+
+        background = Colors.orange.withOpacity(0.15);
+
+        icon = Icons.local_shipping;
+
+        break;
+
+      case 'mantenimiento':
+        color = Colors.red;
+
+        background = Colors.red.withOpacity(0.15);
+
+        icon = Icons.build;
+
+        break;
+
+      case 'en tránsito':
+      case 'en transito':
+        color = Colors.blue;
+
+        background = Colors.blue.withOpacity(0.15);
+
+        icon = Icons.directions_boat;
+
+        break;
+
+      case 'en puerto':
+        color = Colors.orange;
+
+        background = Colors.orange.withOpacity(0.15);
+
+        icon = Icons.anchor;
+
+        break;
+
+      default:
+        color = Colors.grey;
+
+        background = Colors.grey.withOpacity(0.15);
+
+        icon = Icons.info;
+    }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
 
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: background,
 
         borderRadius: BorderRadius.circular(20),
       ),
@@ -60,7 +81,7 @@ class StatusBadge extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
 
         children: [
-          Icon(getIcon(), size: 16, color: color),
+          Icon(icon, size: 16, color: color),
 
           const SizedBox(width: 6),
 

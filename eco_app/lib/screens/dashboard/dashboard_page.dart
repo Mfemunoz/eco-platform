@@ -4,6 +4,7 @@ import '../../services/dashboard_service.dart';
 import '../../widgets/metric_card.dart';
 
 import '../containers/containers_page.dart';
+import '../vehicles/vehicles_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -13,11 +14,14 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  final DashboardService _service = DashboardService();
+  final DashboardService service = DashboardService();
 
   int containers = 0;
+
   int operations = 0;
+
   int inMovement = 0;
+
   int finished = 0;
 
   bool loading = true;
@@ -26,15 +30,15 @@ class _DashboardPageState extends State<DashboardPage> {
   void initState() {
     super.initState();
 
-    loadMetrics();
+    loadDashboard();
   }
 
-  Future<void> loadMetrics() async {
-    final total = await _service.getTotalContainers();
+  Future<void> loadDashboard() async {
+    final total = await service.getTotalContainers();
 
-    final transit = await _service.getInTransitContainers();
+    final transit = await service.getInTransitContainers();
 
-    final complete = await _service.getFinishedContainers();
+    final complete = await service.getFinishedContainers();
 
     setState(() {
       containers = total;
@@ -69,7 +73,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 25),
 
                   Wrap(
                     spacing: 16,
@@ -77,7 +81,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     runSpacing: 16,
 
                     children: [
-                      metric(
+                      metricCard(
                         Icons.inventory_2,
 
                         containers.toString(),
@@ -85,7 +89,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         'Contenedores',
                       ),
 
-                      metric(
+                      metricCard(
                         Icons.local_shipping,
 
                         operations.toString(),
@@ -93,7 +97,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         'Operaciones',
                       ),
 
-                      metric(
+                      metricCard(
                         Icons.route,
 
                         inMovement.toString(),
@@ -101,7 +105,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         'En Movimiento',
                       ),
 
-                      metric(
+                      metricCard(
                         Icons.check_circle,
 
                         finished.toString(),
@@ -142,7 +146,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
                     'Control de flota y asignaciones',
 
-                    null,
+                    const VehiclesPage(),
                   ),
 
                   moduleCard(
@@ -174,7 +178,7 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget metric(IconData icon, String value, String label) {
+  Widget metricCard(IconData icon, String value, String label) {
     return SizedBox(
       width: 230,
 
