@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/widgets/metric_card.dart';
+import '../containers/containers_page.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -10,157 +10,227 @@ class DashboardPage extends StatelessWidget {
       appBar: AppBar(title: const Text('Dashboard ECO')),
 
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(8),
 
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
 
-            children: [
-              const Text(
-                'Resumen Operativo',
+          children: [
+            const Text(
+              'Resumen Operativo',
 
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
 
-              const SizedBox(height: 20),
+            const SizedBox(height: 15),
 
-              Wrap(
-                spacing: 12,
+            GridView.count(
+              shrinkWrap: true,
 
-                runSpacing: 12,
+              physics: const NeverScrollableScrollPhysics(),
 
-                children: const [
-                  SizedBox(
-                    width: 280,
+              crossAxisCount: 4,
 
-                    height: 100,
+              crossAxisSpacing: 12,
 
-                    child: MetricCard(
-                      title: 'Contenedores',
+              mainAxisSpacing: 12,
 
-                      value: '0',
+              childAspectRatio: 2.5,
 
-                      icon: Icons.inventory_2,
-                    ),
-                  ),
+              children: [
+                _metricCard(Icons.inventory_2, '0', 'Contenedores'),
 
-                  SizedBox(
-                    width: 280,
+                _metricCard(Icons.local_shipping, '0', 'Operaciones'),
 
-                    height: 100,
+                _metricCard(Icons.route, '0', 'En Movimiento'),
 
-                    child: MetricCard(
-                      title: 'Operaciones',
+                _metricCard(Icons.check_circle, '0', 'Finalizados'),
+              ],
+            ),
 
-                      value: '0',
+            const SizedBox(height: 30),
 
-                      icon: Icons.local_shipping,
-                    ),
-                  ),
+            const Text(
+              'Módulos ECO',
 
-                  SizedBox(
-                    width: 280,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
 
-                    height: 100,
+            const SizedBox(height: 10),
 
-                    child: MetricCard(
-                      title: 'En Movimiento',
+            _moduleCard(
+              context,
 
-                      value: '0',
+              Icons.inventory_2,
 
-                      icon: Icons.route,
-                    ),
-                  ),
+              'Contenedores',
 
-                  SizedBox(
-                    width: 280,
+              'Gestión y seguimiento operativo',
 
-                    height: 100,
+              true,
+            ),
 
-                    child: MetricCard(
-                      title: 'Finalizados',
+            _moduleCard(
+              context,
 
-                      value: '0',
+              Icons.local_shipping,
 
-                      icon: Icons.check_circle,
-                    ),
-                  ),
-                ],
-              ),
+              'Vehículos',
 
-              const SizedBox(height: 30),
+              'Control de flota y asignaciones',
 
-              const Text(
-                'Módulos ECO',
+              false,
+            ),
 
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
+            _moduleCard(
+              context,
 
-              const SizedBox(height: 12),
+              Icons.assignment,
 
-              _moduleCard(
-                icon: Icons.inventory_2,
+              'Programaciones',
 
-                title: 'Contenedores',
+              'Planificación de operaciones',
 
-                subtitle: 'Gestión y seguimiento operativo',
-              ),
+              false,
+            ),
 
-              _moduleCard(
-                icon: Icons.local_shipping,
+            _moduleCard(
+              context,
 
-                title: 'Vehículos',
+              Icons.bar_chart,
 
-                subtitle: 'Control de flota y asignaciones',
-              ),
+              'Reportes',
 
-              _moduleCard(
-                icon: Icons.assignment,
+              'Indicadores y análisis',
 
-                title: 'Programaciones',
-
-                subtitle: 'Planificación de operaciones',
-              ),
-
-              _moduleCard(
-                icon: Icons.bar_chart,
-
-                title: 'Reportes',
-
-                subtitle: 'Indicadores y análisis',
-              ),
-            ],
-          ),
+              false,
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _moduleCard({
-    required IconData icon,
+  Widget _metricCard(IconData icon, String value, String label) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
 
-    required String title,
+        borderRadius: BorderRadius.circular(12),
 
-    required String subtitle,
-  }) {
-    return Card(
-      elevation: 1,
+        border: Border.all(color: Colors.grey.shade200),
 
-      margin: const EdgeInsets.only(bottom: 8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
 
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            blurRadius: 4,
 
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
 
-        leading: Icon(icon, color: Colors.green),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
 
-        title: Text(title),
+        children: [
+          Icon(icon, color: Colors.green, size: 25),
 
-        subtitle: Text(subtitle),
+          const SizedBox(width: 12),
 
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+
+            crossAxisAlignment: CrossAxisAlignment.start,
+
+            children: [
+              Text(
+                value,
+
+                style: const TextStyle(
+                  fontSize: 18,
+
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              Text(label, style: TextStyle(fontSize: 11, color: Colors.grey)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _moduleCard(
+    BuildContext context,
+
+    IconData icon,
+
+    String title,
+
+    String subtitle,
+
+    bool active,
+  ) {
+    return InkWell(
+      onTap: active
+          ? () {
+              Navigator.push(
+                context,
+
+                MaterialPageRoute(builder: (_) => const ContainersPage()),
+              );
+            }
+          : null,
+
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+
+        decoration: BoxDecoration(
+          color: Colors.white,
+
+          borderRadius: BorderRadius.circular(12),
+
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.green),
+
+            const SizedBox(width: 15),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+
+                children: [
+                  Text(
+                    title,
+
+                    style: const TextStyle(
+                      fontSize: 15,
+
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+
+                  Text(
+                    subtitle,
+
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+
+            const Icon(Icons.arrow_forward_ios, size: 15),
+          ],
+        ),
       ),
     );
   }
