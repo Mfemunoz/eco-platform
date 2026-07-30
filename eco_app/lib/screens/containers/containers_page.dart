@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/container_model.dart';
 import '../../services/containers_service.dart';
+import 'container_detail_page.dart';
 
 class ContainersPage extends StatefulWidget {
   const ContainersPage({super.key});
@@ -37,7 +38,7 @@ class _ContainersPageState extends State<ContainersPage> {
             const Text(
               'Gestión y seguimiento operativo',
 
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 20),
@@ -69,48 +70,90 @@ class _ContainersPageState extends State<ContainersPage> {
                     itemBuilder: (context, index) {
                       final container = containers[index];
 
-                      return Card(
-                        elevation: 2,
+                      return InkWell(
+                        borderRadius: BorderRadius.circular(12),
 
-                        margin: const EdgeInsets.only(bottom: 12),
+                        onTap: () {
+                          Navigator.push(
+                            context,
 
-                        child: ListTile(
-                          leading: Container(
-                            padding: const EdgeInsets.all(8),
-
-                            decoration: BoxDecoration(
-                              color: Colors.green.withOpacity(0.1),
-
-                              borderRadius: BorderRadius.circular(8),
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  ContainerDetailPage(container: container),
                             ),
+                          );
+                        },
 
-                            child: const Icon(
-                              Icons.inventory_2,
+                        child: Card(
+                          elevation: 2,
 
-                              color: Colors.green,
+                          margin: const EdgeInsets.only(bottom: 12),
+
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+
+                                  decoration: BoxDecoration(
+                                    color: Colors.green.withOpacity(0.15),
+
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+
+                                  child: const Icon(
+                                    Icons.inventory_2,
+
+                                    color: Colors.green,
+                                  ),
+                                ),
+
+                                const SizedBox(width: 15),
+
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+
+                                    children: [
+                                      Text(
+                                        container.numeroContenedor,
+
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+
+                                          fontSize: 16,
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 4),
+
+                                      Text('Naviera: ${container.naviera}'),
+
+                                      Text(
+                                        '${container.origen} → ${container.destino}',
+                                      ),
+
+                                      Text('Estado: ${container.estado}'),
+
+                                      Text(
+                                        'Ubicación: ${container.ubicacionActual}',
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                const Icon(
+                                  Icons.arrow_forward_ios,
+
+                                  size: 16,
+
+                                  color: Colors.grey,
+                                ),
+                              ],
                             ),
-                          ),
-
-                          title: Text(
-                            container.numeroContenedor,
-
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-
-                            children: [
-                              Text('Naviera: ${container.naviera}'),
-
-                              Text(
-                                '${container.origen} → ${container.destino}',
-                              ),
-
-                              Text('Estado: ${container.estado}'),
-
-                              Text('Ubicación: ${container.ubicacionActual}'),
-                            ],
                           ),
                         ),
                       );
