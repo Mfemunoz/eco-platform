@@ -20,4 +20,30 @@ class VehicleDetailService {
       return null;
     }
   }
+
+  Future<bool> finalizarOperacion(String programationId, int vehicleId) async {
+    try {
+      final programationResponse = await supabase
+          .from('vehicle_programations')
+          .update({'estado': 'Finalizado'})
+          .eq('id', programationId)
+          .select();
+
+      print('PROGRAMACION FINALIZADA: $programationResponse');
+
+      final vehicleResponse = await supabase
+          .from('vehicles')
+          .update({'estado': 'Disponible'})
+          .eq('id', vehicleId)
+          .select();
+
+      print('VEHICULO DISPONIBLE: $vehicleResponse');
+
+      return true;
+    } catch (e) {
+      print('Error finalizando operación: $e');
+
+      return false;
+    }
+  }
 }

@@ -4,6 +4,7 @@ import '../../models/vehicle_programation_model.dart';
 import '../../models/vehicle_model.dart';
 
 import '../../services/vehicle_detail_service.dart';
+
 import '../../widgets/status_badge.dart';
 
 class ProgramationDetailPage extends StatefulWidget {
@@ -30,23 +31,31 @@ class _ProgramationDetailPageState extends State<ProgramationDetailPage> {
   }
 
   Future<void> loadVehicle() async {
-    print('==============================');
-
-    print('BUSCANDO VEHICULO ID: ${widget.programation.vehicleId}');
-
     final data = await vehicleService.getVehicleById(
       widget.programation.vehicleId,
     );
-
-    print('VEHICULO ENCONTRADO: $data');
-
-    print('==============================');
 
     setState(() {
       vehicle = data;
 
       loadingVehicle = false;
     });
+  }
+
+  Future<void> finalizarOperacion() async {
+    final result = await vehicleService.finalizarOperacion(
+      widget.programation.id,
+
+      widget.programation.vehicleId,
+    );
+
+    if (result) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Operación finalizada correctamente')),
+      );
+
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -64,8 +73,6 @@ class _ProgramationDetailPageState extends State<ProgramationDetailPage> {
 
           children: [
             Card(
-              elevation: 1,
-
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -92,8 +99,6 @@ class _ProgramationDetailPageState extends State<ProgramationDetailPage> {
                             Icons.calendar_month,
 
                             color: Colors.green,
-
-                            size: 28,
                           ),
                         ),
 
@@ -152,39 +157,21 @@ class _ProgramationDetailPageState extends State<ProgramationDetailPage> {
                   ? const Padding(
                       padding: EdgeInsets.all(20),
 
-                      child: Center(child: CircularProgressIndicator()),
+                      child: CircularProgressIndicator(),
                     )
                   : vehicle == null
-                  ? const ListTile(
-                      leading: Icon(Icons.warning, color: Colors.orange),
-
-                      title: Text('Vehículo no encontrado'),
-                    )
+                  ? const ListTile(title: Text('Vehículo no encontrado'))
                   : ListTile(
-                      leading: Container(
-                        padding: const EdgeInsets.all(10),
+                      leading: const Icon(
+                        Icons.local_shipping,
 
-                        decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.15),
-
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-
-                        child: const Icon(
-                          Icons.local_shipping,
-
-                          color: Colors.green,
-                        ),
+                        color: Colors.green,
                       ),
 
                       title: Text(
                         vehicle!.placa,
 
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-
-                          fontSize: 18,
-                        ),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
 
                       subtitle: Text(
@@ -196,6 +183,27 @@ class _ProgramationDetailPageState extends State<ProgramationDetailPage> {
                       trailing: StatusBadge(estado: vehicle!.estado),
                     ),
             ),
+
+            const SizedBox(height: 20),
+
+            if (programation.estado == 'En ruta')
+              SizedBox(
+                width: double.infinity,
+
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.check_circle),
+
+                  label: const Text('Finalizar operación'),
+
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+
+                    foregroundColor: Colors.white,
+                  ),
+
+                  onPressed: finalizarOperacion,
+                ),
+              ),
           ],
         ),
       ),
