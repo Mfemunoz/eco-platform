@@ -5,6 +5,7 @@ import '../../widgets/metric_card.dart';
 
 import '../containers/containers_page.dart';
 import '../vehicles/vehicles_page.dart';
+import '../programations/programations_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -158,7 +159,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
                     'Planificación de operaciones',
 
-                    null,
+                    const ProgramationsPage(),
                   ),
 
                   moduleCard(
