@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-import 'services/supabase_service.dart';
+import 'screens/login/login_page.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  await SupabaseService.initialize();
-
+void main() {
   runApp(const EcoApp());
 }
 
@@ -15,17 +11,13 @@ class EcoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       title: 'ECO Platform',
-      home: Scaffold(
-        appBar: AppBar(title: const Text('ECO Platform')),
-        body: const Center(
-          child: Text(
-            'Conectado a Supabase 🚀',
-            style: TextStyle(fontSize: 24),
-          ),
-        ),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        useMaterial3: true,
       ),
+      home: const LoginPage(),
     );
   }
 }
