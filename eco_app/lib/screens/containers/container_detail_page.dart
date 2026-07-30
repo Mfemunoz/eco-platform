@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../models/container_model.dart';
+import '../../../models/container_model.dart';
+import '../../../widgets/status_badge.dart';
 
 class ContainerDetailPage extends StatelessWidget {
   final ContainerModel container;
@@ -13,7 +14,7 @@ class ContainerDetailPage extends StatelessWidget {
       appBar: AppBar(title: const Text('Detalle Contenedor')),
 
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
 
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,7 +68,19 @@ class ContainerDetailPage extends StatelessWidget {
 
                     _item('Ruta', '${container.origen} → ${container.destino}'),
 
-                    _item('Estado', container.estado),
+                    const SizedBox(height: 10),
+
+                    const Text(
+                      'Estado',
+
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    StatusBadge(estado: container.estado),
+
+                    const SizedBox(height: 12),
 
                     _item('Ubicación actual', container.ubicacionActual),
                   ],
@@ -83,7 +96,7 @@ class ContainerDetailPage extends StatelessWidget {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: 10),
 
             _timelineItem('Registro creado', true),
 
@@ -103,8 +116,6 @@ class ContainerDetailPage extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 10),
 
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-
         children: [
           SizedBox(
             width: 130,

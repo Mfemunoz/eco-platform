@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../models/container_model.dart';
-import '../../services/containers_service.dart';
+import '../../../models/container_model.dart';
+import '../../../services/containers_service.dart';
+import '../../../widgets/status_badge.dart';
 import 'container_detail_page.dart';
 
 class ContainersPage extends StatefulWidget {
@@ -128,7 +129,7 @@ class _ContainersPageState extends State<ContainersPage> {
                                         ),
                                       ),
 
-                                      const SizedBox(height: 4),
+                                      const SizedBox(height: 5),
 
                                       Text('Naviera: ${container.naviera}'),
 
@@ -136,11 +137,9 @@ class _ContainersPageState extends State<ContainersPage> {
                                         '${container.origen} → ${container.destino}',
                                       ),
 
-                                      Text('Estado: ${container.estado}'),
+                                      const SizedBox(height: 8),
 
-                                      Text(
-                                        'Ubicación: ${container.ubicacionActual}',
-                                      ),
+                                      StatusBadge(estado: container.estado),
                                     ],
                                   ),
                                 ),
