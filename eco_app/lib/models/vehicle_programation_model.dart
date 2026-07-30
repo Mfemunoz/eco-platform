@@ -1,17 +1,17 @@
 class VehicleProgramationModel {
   final String id;
 
-  final String vehicleId;
+  final int vehicleId;
 
   final String servicio;
-
-  final String fecha;
-
-  final String horaProgramada;
 
   final String origen;
 
   final String destino;
+
+  final String fecha;
+
+  final String horaProgramada;
 
   final String estado;
 
@@ -22,13 +22,13 @@ class VehicleProgramationModel {
 
     required this.servicio,
 
-    required this.fecha,
-
-    required this.horaProgramada,
-
     required this.origen,
 
     required this.destino,
+
+    required this.fecha,
+
+    required this.horaProgramada,
 
     required this.estado,
   });
@@ -37,17 +37,17 @@ class VehicleProgramationModel {
     return VehicleProgramationModel(
       id: map['id'].toString(),
 
-      vehicleId: map['vehicle_id'].toString(),
+      vehicleId: int.parse(map['vehicle_id'].toString()),
 
       servicio: map['servicio'] ?? '',
-
-      fecha: map['fecha'] ?? '',
-
-      horaProgramada: map['hora_programada'] ?? '',
 
       origen: map['origen'] ?? '',
 
       destino: map['destino'] ?? '',
+
+      fecha: map['fecha'] ?? '',
+
+      horaProgramada: map['hora_programada'] ?? '',
 
       estado: map['estado'] ?? '',
     );

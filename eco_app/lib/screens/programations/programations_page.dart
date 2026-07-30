@@ -4,6 +4,8 @@ import '../../models/vehicle_programation_model.dart';
 
 import '../../services/vehicle_programation_service.dart';
 
+import 'programation_detail_page.dart';
+
 class ProgramationsPage extends StatefulWidget {
   const ProgramationsPage({super.key});
 
@@ -53,8 +55,36 @@ class _ProgramationsPageState extends State<ProgramationsPage> {
                 final item = programations[index];
 
                 return Card(
+                  elevation: 1,
+
+                  margin: const EdgeInsets.only(bottom: 12),
+
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+
                   child: ListTile(
-                    leading: const Icon(Icons.event, color: Colors.green),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+
+                      vertical: 10,
+                    ),
+
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.15),
+
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+
+                      child: const Icon(
+                        Icons.calendar_month,
+
+                        color: Colors.green,
+                      ),
+                    ),
 
                     title: Text(
                       item.servicio,
@@ -62,11 +92,28 @@ class _ProgramationsPageState extends State<ProgramationsPage> {
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
 
-                    subtitle: Text(
-                      '${item.origen} → ${item.destino}\n'
-                      '${item.fecha} ${item.horaProgramada}\n'
-                      'Estado: ${item.estado}',
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 6),
+
+                      child: Text(
+                        '${item.origen} → ${item.destino}\n'
+                        '${item.fecha} ${item.horaProgramada}\n'
+                        'Estado: ${item.estado}',
+                      ),
                     ),
+
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+
+                    onTap: () {
+                      Navigator.push(
+                        context,
+
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              ProgramationDetailPage(programation: item),
+                        ),
+                      );
+                    },
                   ),
                 );
               },
