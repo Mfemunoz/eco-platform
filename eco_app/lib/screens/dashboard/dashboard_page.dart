@@ -1,169 +1,190 @@
 import 'package:flutter/material.dart';
+
+import '../../services/dashboard_service.dart';
+import '../../widgets/metric_card.dart';
+
 import '../containers/containers_page.dart';
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
+
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  final DashboardService _service = DashboardService();
+
+  int containers = 0;
+  int operations = 0;
+  int inMovement = 0;
+  int finished = 0;
+
+  bool loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    loadMetrics();
+  }
+
+  Future<void> loadMetrics() async {
+    final total = await _service.getTotalContainers();
+
+    final transit = await _service.getInTransitContainers();
+
+    final complete = await _service.getFinishedContainers();
+
+    setState(() {
+      containers = total;
+
+      operations = total;
+
+      inMovement = transit;
+
+      finished = complete;
+
+      loading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Dashboard ECO')),
 
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(8),
+      body: loading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
 
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
 
-          children: [
-            const Text(
-              'Resumen Operativo',
+                children: [
+                  const Text(
+                    'Resumen Operativo',
 
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
 
-            const SizedBox(height: 15),
+                  const SizedBox(height: 20),
 
-            GridView.count(
-              shrinkWrap: true,
+                  Wrap(
+                    spacing: 16,
 
-              physics: const NeverScrollableScrollPhysics(),
+                    runSpacing: 16,
 
-              crossAxisCount: 4,
+                    children: [
+                      metric(
+                        Icons.inventory_2,
 
-              crossAxisSpacing: 12,
+                        containers.toString(),
 
-              mainAxisSpacing: 12,
+                        'Contenedores',
+                      ),
 
-              childAspectRatio: 2.5,
+                      metric(
+                        Icons.local_shipping,
 
-              children: [
-                _metricCard(Icons.inventory_2, '0', 'Contenedores'),
+                        operations.toString(),
 
-                _metricCard(Icons.local_shipping, '0', 'Operaciones'),
+                        'Operaciones',
+                      ),
 
-                _metricCard(Icons.route, '0', 'En Movimiento'),
+                      metric(
+                        Icons.route,
 
-                _metricCard(Icons.check_circle, '0', 'Finalizados'),
-              ],
-            ),
+                        inMovement.toString(),
 
-            const SizedBox(height: 30),
+                        'En Movimiento',
+                      ),
 
-            const Text(
-              'Módulos ECO',
+                      metric(
+                        Icons.check_circle,
 
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
+                        finished.toString(),
 
-            const SizedBox(height: 10),
+                        'Finalizados',
+                      ),
+                    ],
+                  ),
 
-            _moduleCard(
-              context,
+                  const SizedBox(height: 35),
 
-              Icons.inventory_2,
+                  const Text(
+                    'Módulos ECO',
 
-              'Contenedores',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
 
-              'Gestión y seguimiento operativo',
+                  const SizedBox(height: 12),
 
-              true,
-            ),
+                  moduleCard(
+                    context,
 
-            _moduleCard(
-              context,
+                    Icons.inventory_2,
 
-              Icons.local_shipping,
+                    'Contenedores',
 
-              'Vehículos',
+                    'Gestión y seguimiento operativo',
 
-              'Control de flota y asignaciones',
+                    const ContainersPage(),
+                  ),
 
-              false,
-            ),
+                  moduleCard(
+                    context,
 
-            _moduleCard(
-              context,
+                    Icons.local_shipping,
 
-              Icons.assignment,
+                    'Vehículos',
 
-              'Programaciones',
+                    'Control de flota y asignaciones',
 
-              'Planificación de operaciones',
+                    null,
+                  ),
 
-              false,
-            ),
+                  moduleCard(
+                    context,
 
-            _moduleCard(
-              context,
+                    Icons.assignment,
 
-              Icons.bar_chart,
+                    'Programaciones',
 
-              'Reportes',
+                    'Planificación de operaciones',
 
-              'Indicadores y análisis',
+                    null,
+                  ),
 
-              false,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+                  moduleCard(
+                    context,
 
-  Widget _metricCard(IconData icon, String value, String label) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
+                    Icons.bar_chart,
 
-        borderRadius: BorderRadius.circular(12),
+                    'Reportes',
 
-        border: Border.all(color: Colors.grey.shade200),
+                    'Indicadores y análisis',
 
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-
-            blurRadius: 4,
-
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-
-        children: [
-          Icon(icon, color: Colors.green, size: 25),
-
-          const SizedBox(width: 12),
-
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-
-            crossAxisAlignment: CrossAxisAlignment.start,
-
-            children: [
-              Text(
-                value,
-
-                style: const TextStyle(
-                  fontSize: 18,
-
-                  fontWeight: FontWeight.bold,
-                ),
+                    null,
+                  ),
+                ],
               ),
-
-              Text(label, style: TextStyle(fontSize: 11, color: Colors.grey)),
-            ],
-          ),
-        ],
-      ),
+            ),
     );
   }
 
-  Widget _moduleCard(
+  Widget metric(IconData icon, String value, String label) {
+    return SizedBox(
+      width: 230,
+
+      height: 110,
+
+      child: MetricCard(icon: icon, value: value, label: label),
+    );
+  }
+
+  Widget moduleCard(
     BuildContext context,
 
     IconData icon,
@@ -172,65 +193,35 @@ class DashboardPage extends StatelessWidget {
 
     String subtitle,
 
-    bool active,
+    Widget? page,
   ) {
-    return InkWell(
-      onTap: active
-          ? () {
-              Navigator.push(
-                context,
+    return Card(
+      elevation: 0,
 
-                MaterialPageRoute(builder: (_) => const ContainersPage()),
-              );
-            }
-          : null,
+      margin: const EdgeInsets.only(bottom: 12),
 
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
 
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
 
-        decoration: BoxDecoration(
-          color: Colors.white,
+        leading: Icon(icon, color: Colors.green),
 
-          borderRadius: BorderRadius.circular(12),
+        title: Text(title),
 
-          border: Border.all(color: Colors.grey.shade200),
-        ),
+        subtitle: Text(subtitle),
 
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.green),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
 
-            const SizedBox(width: 15),
+        onTap: page == null
+            ? null
+            : () {
+                Navigator.push(
+                  context,
 
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-
-                children: [
-                  Text(
-                    title,
-
-                    style: const TextStyle(
-                      fontSize: 15,
-
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-
-                  Text(
-                    subtitle,
-
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
-
-            const Icon(Icons.arrow_forward_ios, size: 15),
-          ],
-        ),
+                  MaterialPageRoute(builder: (_) => page),
+                );
+              },
       ),
     );
   }
