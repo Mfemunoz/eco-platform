@@ -40,4 +40,41 @@ class VehicleService {
       return [];
     }
   }
+
+  Future<List<VehicleModel>> getAvailableVehicles() async {
+    try {
+      final response = await supabase
+          .from('vehicles')
+          .select()
+          .eq('estado', 'Disponible');
+
+      print('==============================');
+
+      print('VEHICULOS DISPONIBLES:');
+
+      print(response);
+
+      print('TOTAL DISPONIBLES: ${response.length}');
+
+      print('==============================');
+
+      final vehicles = response
+          .map<VehicleModel>((item) => VehicleModel.fromMap(item))
+          .toList();
+
+      print('MODELOS DISPONIBLES CREADOS: ${vehicles.length}');
+
+      return vehicles;
+    } catch (e) {
+      print('==============================');
+
+      print('ERROR VEHICULOS DISPONIBLES');
+
+      print(e);
+
+      print('==============================');
+
+      return [];
+    }
+  }
 }

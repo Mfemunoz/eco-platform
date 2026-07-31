@@ -4,6 +4,7 @@ import '../../models/vehicle_programation_model.dart';
 import '../../services/vehicle_programation_service.dart';
 
 import 'programation_detail_page.dart';
+import 'create_programation_page.dart';
 
 class ProgramationsPage extends StatefulWidget {
   const ProgramationsPage({super.key});
@@ -44,10 +45,32 @@ class _ProgramationsPageState extends State<ProgramationsPage> {
     await loadProgramations();
   }
 
+  Future<void> openCreateProgramation() async {
+    await Navigator.push(
+      context,
+
+      MaterialPageRoute(builder: (_) => const CreateProgramationPage()),
+    );
+
+    // refresca automáticamente al regresar
+
+    refreshProgramations();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Programaciones ECO')),
+
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: Colors.green,
+
+        icon: const Icon(Icons.add),
+
+        label: const Text("Nueva programación"),
+
+        onPressed: openCreateProgramation,
+      ),
 
       body: loading
           ? const Center(child: CircularProgressIndicator())
@@ -127,8 +150,6 @@ class _ProgramationsPageState extends State<ProgramationsPage> {
                                 ProgramationDetailPage(programation: item),
                           ),
                         );
-
-                        // Recarga automática al volver
 
                         refreshProgramations();
                       },
