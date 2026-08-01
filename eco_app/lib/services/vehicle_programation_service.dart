@@ -17,13 +17,9 @@ class VehicleProgramationService {
           .order('created_at', ascending: false);
 
       print('==============================');
-
       print('PROGRAMACIONES SUPABASE');
-
       print(response);
-
       print('TOTAL PROGRAMACIONES: ${response.length}');
-
       print('==============================');
 
       return response
@@ -33,7 +29,6 @@ class VehicleProgramationService {
           .toList();
     } catch (e) {
       print('ERROR CARGANDO PROGRAMACIONES');
-
       print(e);
 
       return [];
@@ -53,16 +48,6 @@ class VehicleProgramationService {
           .select()
           .eq('vehicle_id', vehicleId);
 
-      print('==============================');
-
-      print('PROGRAMACIONES VEHICULO');
-
-      print(response);
-
-      print('TOTAL: ${response.length}');
-
-      print('==============================');
-
       return response
           .map<VehicleProgramationModel>(
             (item) => VehicleProgramationModel.fromMap(item),
@@ -70,7 +55,6 @@ class VehicleProgramationService {
           .toList();
     } catch (e) {
       print('ERROR PROGRAMACIONES VEHICULO');
-
       print(e);
 
       return [];
@@ -78,7 +62,14 @@ class VehicleProgramationService {
   }
 
   // =====================================
-  // CREAR NUEVA PROGRAMACION
+  // CREAR NUEVA PROGRAMACION ECO
+  //
+  // Flujo:
+  //
+  // 1. Crear programación
+  // 2. Crear evento inicial
+  // 3. Cambiar vehículo Disponible -> Asignado
+  //
   // =====================================
 
   Future<bool> createProgramation({
@@ -96,19 +87,19 @@ class VehicleProgramationService {
   }) async {
     try {
       print('==============================');
-
-      print('CREANDO PROGRAMACION');
-
+      print('CREANDO PROGRAMACION ECO');
       print('VEHICULO: $vehicleId');
-
       print('SERVICIO: $servicio');
-
       print('==============================');
 
-      // 1. Crear programación
+      // =================================
+      // PASO 1
+      // Crear programación
+      // =================================
 
-      final programationResponse =
-          await supabase.from('vehicle_programations').insert({
+      final programationResponse = await supabase
+          .from('vehicle_programations')
+          .insert({
             'vehicle_id': vehicleId,
 
             'servicio': servicio,
@@ -122,11 +113,41 @@ class VehicleProgramationService {
             'destino': destino,
 
             'estado': 'Programado',
-          }).select();
+          })
+          .select()
+          .single();
 
-      print('PROGRAMACION CREADA: $programationResponse');
+      print('==============================');
+      print('PROGRAMACION CREADA');
+      print(programationResponse);
+      print('==============================');
 
-      // 2. Cambiar estado vehículo
+      final int programationId = programationResponse['id'];
+
+      // =================================
+      // PASO 2
+      // Crear evento inicial
+      // =================================
+
+      final eventResponse = await supabase.from('movement_events').insert({
+        'programation_id': programationId,
+
+        'evento': 'Programación creada',
+
+        'observacion': servicio,
+
+        'usuario': 'Sistema',
+      }).select();
+
+      print('==============================');
+      print('EVENTO CREADO');
+      print(eventResponse);
+      print('==============================');
+
+      // =================================
+      // PASO 3
+      // Actualizar vehículo
+      // =================================
 
       final vehicleResponse = await supabase
           .from('vehicles')
@@ -134,22 +155,18 @@ class VehicleProgramationService {
           .eq('id', vehicleId)
           .select();
 
-      print('VEHICULO ACTUALIZADO: $vehicleResponse');
-
+      print('==============================');
+      print('VEHICULO ACTUALIZADO');
+      print(vehicleResponse);
       print('==============================');
 
-      print('MOVIMIENTO CREADO CORRECTAMENTE');
-
-      print('==============================');
+      print('MOVIMIENTO ECO CREADO CORRECTAMENTE');
 
       return true;
     } catch (e) {
       print('==============================');
-
-      print('ERROR CREANDO PROGRAMACION');
-
+      print('ERROR CREANDO PROGRAMACION ECO');
       print(e);
-
       print('==============================');
 
       return false;

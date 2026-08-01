@@ -1,5 +1,5 @@
 class VehicleProgramationModel {
-  final String id;
+  final int id;
 
   final int vehicleId;
 
@@ -35,7 +35,7 @@ class VehicleProgramationModel {
 
   factory VehicleProgramationModel.fromMap(Map<String, dynamic> map) {
     return VehicleProgramationModel(
-      id: map['id'].toString(),
+      id: int.parse(map['id'].toString()),
 
       vehicleId: int.parse(map['vehicle_id'].toString()),
 

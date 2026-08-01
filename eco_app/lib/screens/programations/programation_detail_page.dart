@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../models/vehicle_programation_model.dart';
 import '../../models/vehicle_model.dart';
+import '../../models/movement_event_model.dart';
 
 import '../../services/vehicle_detail_service.dart';
+import '../../services/movement_event_service.dart';
 
 import '../../widgets/status_badge.dart';
 
@@ -19,15 +21,23 @@ class ProgramationDetailPage extends StatefulWidget {
 class _ProgramationDetailPageState extends State<ProgramationDetailPage> {
   final VehicleDetailService vehicleService = VehicleDetailService();
 
+  final MovementEventService eventService = MovementEventService();
+
   VehicleModel? vehicle;
 
+  List<MovementEventModel> events = [];
+
   bool loadingVehicle = true;
+
+  bool loadingEvents = true;
 
   @override
   void initState() {
     super.initState();
 
     loadVehicle();
+
+    loadEvents();
   }
 
   Future<void> loadVehicle() async {
@@ -39,6 +49,18 @@ class _ProgramationDetailPageState extends State<ProgramationDetailPage> {
       vehicle = data;
 
       loadingVehicle = false;
+    });
+  }
+
+  Future<void> loadEvents() async {
+    final data = await eventService.getEventsByProgramation(
+      widget.programation.id,
+    );
+
+    setState(() {
+      events = data;
+
+      loadingEvents = false;
     });
   }
 
@@ -142,7 +164,7 @@ class _ProgramationDetailPageState extends State<ProgramationDetailPage> {
               ),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 25),
 
             const Text(
               'Información operativa',
@@ -181,6 +203,48 @@ class _ProgramationDetailPageState extends State<ProgramationDetailPage> {
                       ),
 
                       trailing: StatusBadge(estado: vehicle!.estado),
+                    ),
+            ),
+
+            const SizedBox(height: 25),
+
+            const Text(
+              'Historial operativo',
+
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+
+            const SizedBox(height: 12),
+
+            Card(
+              child: loadingEvents
+                  ? const Padding(
+                      padding: EdgeInsets.all(20),
+
+                      child: CircularProgressIndicator(),
+                    )
+                  : events.isEmpty
+                  ? const ListTile(
+                      leading: Icon(Icons.timeline),
+
+                      title: Text('Sin eventos registrados'),
+                    )
+                  : Column(
+                      children: events
+                          .map(
+                            (event) => ListTile(
+                              leading: const Icon(
+                                Icons.check_circle,
+
+                                color: Colors.green,
+                              ),
+
+                              title: Text(event.evento),
+
+                              subtitle: Text(event.fechaHora),
+                            ),
+                          )
+                          .toList(),
                     ),
             ),
 

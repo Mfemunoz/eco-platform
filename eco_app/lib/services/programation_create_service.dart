@@ -8,8 +8,9 @@ class ProgramationCreateService {
 
   // =====================================================
   // CONSULTAR VEHICULOS DISPONIBLES
-  // Regla PO:
+  //
   // Solo vehículos en estado Disponible pueden asignarse
+  //
   // =====================================================
 
   Future<List<VehicleModel>> getAvailableVehicles() async {
@@ -19,33 +20,43 @@ class ProgramationCreateService {
           .select()
           .eq('estado', 'Disponible');
 
+      print('==============================');
+      print('VEHICULOS DISPONIBLES');
+      print(response);
+      print('TOTAL DISPONIBLES: ${response.length}');
+      print('==============================');
+
       return response
           .map<VehicleModel>((item) => VehicleModel.fromMap(item))
           .toList();
     } catch (e) {
-      print('Error cargando vehículos disponibles: $e');
+      print('==============================');
+      print('ERROR CARGANDO VEHICULOS DISPONIBLES');
+      print(e);
+      print('==============================');
 
       return [];
     }
   }
 
   // =====================================================
-  // CREAR PROGRAMACION
+  // CREAR PROGRAMACION ECO
   //
   // Flujo:
   //
   // 1. Validar vehículo disponible
   // 2. Crear programación
-  // 3. Cambiar vehículo Disponible -> Asignado
+  // 3. Crear evento inicial
+  // 4. Cambiar vehículo a Asignado
   //
   // =====================================================
 
   Future<bool> createProgramation(CreateProgramationModel model) async {
     try {
-      // -------------------------------------------------
+      // =================================================
       // PASO 1
-      // Validar que el vehículo siga disponible
-      // -------------------------------------------------
+      // Validar vehículo disponible
+      // =================================================
 
       final vehicleValidation = await supabase
           .from('vehicles')
@@ -53,19 +64,25 @@ class ProgramationCreateService {
           .eq('id', model.vehicleId)
           .eq('estado', 'Disponible');
 
+      print('==============================');
+      print('VALIDACION VEHICULO');
+      print(vehicleValidation);
+      print('==============================');
+
       if (vehicleValidation.isEmpty) {
-        print('Vehículo no disponible para asignación');
+        print('VEHICULO NO DISPONIBLE');
 
         return false;
       }
 
-      // -------------------------------------------------
+      // =================================================
       // PASO 2
       // Crear programación
-      // -------------------------------------------------
+      // =================================================
 
-      final programationResponse =
-          await supabase.from('vehicle_programations').insert({
+      final programationResponse = await supabase
+          .from('vehicle_programations')
+          .insert({
             'vehicle_id': model.vehicleId,
 
             'servicio': model.servicio,
@@ -79,14 +96,52 @@ class ProgramationCreateService {
             'hora_programada': model.horaProgramada,
 
             'estado': 'Programado',
-          }).select();
+          })
+          .select()
+          .single();
 
-      print('PROGRAMACION CREADA: $programationResponse');
+      print('==============================');
+      print('PROGRAMACION CREADA');
+      print(programationResponse);
+      print('==============================');
 
-      // -------------------------------------------------
+      final int programationId = programationResponse['id'];
+
+      print('ID PROGRAMACION: $programationId');
+
+      // =================================================
       // PASO 3
+      // Crear evento inicial
+      // =================================================
+
+      print('==============================');
+      print('CREANDO EVENTO MOVIMIENTO');
+      print('PROGRAMACION ID: $programationId');
+      print('==============================');
+
+      final eventResponse = await supabase
+          .from('movement_events')
+          .insert({
+            'programation_id': programationId,
+
+            'evento': 'Programación creada',
+
+            'observacion': model.servicio,
+
+            'usuario': 'Sistema',
+          })
+          .select()
+          .single();
+
+      print('==============================');
+      print('EVENTO INSERTADO DESDE FLUTTER');
+      print(eventResponse);
+      print('==============================');
+
+      // =================================================
+      // PASO 4
       // Cambiar vehículo a Asignado
-      // -------------------------------------------------
+      // =================================================
 
       final vehicleResponse = await supabase
           .from('vehicles')
@@ -94,11 +149,21 @@ class ProgramationCreateService {
           .eq('id', model.vehicleId)
           .select();
 
-      print('VEHICULO ASIGNADO: $vehicleResponse');
+      print('==============================');
+      print('VEHICULO ACTUALIZADO');
+      print(vehicleResponse);
+      print('==============================');
+
+      print('==============================');
+      print('MOVIMIENTO ECO CREADO CORRECTAMENTE');
+      print('==============================');
 
       return true;
     } catch (e) {
-      print('Error creando programación: $e');
+      print('==============================');
+      print('ERROR CREANDO PROGRAMACION ECO');
+      print(e);
+      print('==============================');
 
       return false;
     }

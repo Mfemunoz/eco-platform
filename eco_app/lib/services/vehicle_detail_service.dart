@@ -21,7 +21,7 @@ class VehicleDetailService {
     }
   }
 
-  Future<bool> finalizarOperacion(String programationId, int vehicleId) async {
+  Future<bool> finalizarOperacion(int programationId, int vehicleId) async {
     try {
       final programationResponse = await supabase
           .from('vehicle_programations')
